@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -30,7 +31,13 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -47,6 +54,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -209,7 +217,7 @@ fun LoginPreview() {
 }
 
 @Composable
-fun Register() {
+fun Register()  {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -398,13 +406,13 @@ fun Register() {
                 Switch(
                     checked = checked,
                     onCheckedChange = {
-                        checked = !checked
+                        checked = it
                     },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.Red,
-                        checkedTrackColor = Color.Yellow,
-                        uncheckedThumbColor = Color.Green,
-                        uncheckedTrackColor = Color.Blue
+                        checkedThumbColor = Color(0xFF30BEFB),
+                        checkedTrackColor = Color.White,
+                        uncheckedThumbColor = Color.LightGray,
+                        uncheckedTrackColor = Color.White
                     )
                 )
                 Text(
@@ -455,6 +463,7 @@ fun RegisterPreview() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterStepTwo() {
     Column(
@@ -472,38 +481,83 @@ fun RegisterStepTwo() {
                 .size(120.dp)
         )
         Spacer(modifier = Modifier.height(60.dp))
-        var cargo by remember {
-            mutableStateOf(value = "")
+        var isExpanded by remember {
+            mutableStateOf(false)
         }
-        TextField(
-            value = cargo,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Build,
-                    contentDescription = "tool icon"
-                )
-            },
-            onValueChange = { it ->
-                cargo = it
-            },
-            label = {
-                Text(text = "Cargo")
-            },
-            placeholder = {
-                Text(text = "Cargo")
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier
-                .clip(
-                    RoundedCornerShape(
-                        topEnd = 15.dp,
-                        topStart = 15.dp
+
+        var cargo by remember {
+            mutableStateOf("")
+        }
+        ExposedDropdownMenuBox(
+            expanded = isExpanded,
+            onExpandedChange = {
+                isExpanded = it
+            }
+        ) {
+            TextField(
+                value = cargo,
+                onValueChange = {},
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Build,
+                        contentDescription = null
                     )
+                },
+                placeholder = {
+                    Text(text = "Cargo")
+                },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = isExpanded,
+                onDismissRequest = { isExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = "Desenvolvedor Back-end"
+                        )
+                    },
+                    onClick = {
+                        isExpanded = false
+                        cargo = "Desenvolvedor Back-end"
+                    }
                 )
-                .background(color = Color(0xFFF8F8F8))
-                .fillMaxWidth()
-        )
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = "Desenvolvedor Front-end"
+                        )
+                    },
+                    onClick = {
+                        isExpanded = false
+                        cargo = "Desenvolvedor Front-end"
+                    }
+                )
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = "Desenvolvedor Fullstack"
+                        )
+                    },
+                    onClick = {
+                        isExpanded = false
+                        cargo = "Desenvolvedor Fullstack"
+                    }
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(4.dp))
+
         var telefone by remember {
             mutableStateOf(value = "")
         }
@@ -524,7 +578,7 @@ fun RegisterStepTwo() {
             placeholder = {
                 Text(text = "Telefone")
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier
                 .background(color = Color(0xFFF8F8F8))
                 .fillMaxWidth()
@@ -550,7 +604,7 @@ fun RegisterStepTwo() {
             placeholder = {
                 Text(text = "Valor por hora(R$)")
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .clip(
                     RoundedCornerShape(
@@ -561,6 +615,36 @@ fun RegisterStepTwo() {
                 .background(color = Color(0xFFF8F8F8))
                 .fillMaxWidth()
         )
+        Text(
+            text = "Experiência",
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 16.dp, 0.dp, 4.dp)
+        )
+        val expOptions = listOf("Júnior","Pleno","Sênior")
+        var selectedExp by remember {
+            mutableStateOf(expOptions[0])
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            expOptions.forEach { expName ->
+                RadioButton(
+                    selected = expName == selectedExp,
+                    onClick = {
+                        selectedExp = expName
+                    }
+                )
+                Text(
+                    text = expName,
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(28.dp))
         Button(
             onClick = { /*TODO*/ },
